@@ -345,8 +345,10 @@ public final class YoungAndroidFormUpgrader {
 
       } else if (componentType.equals("WebViewer")) {
         srcCompVersion = upgradeWebViewerProperties(componentProperties, srcCompVersion);
+
       } else if (componentType.equals("FirebaseDB")) {
         srcCompVersion = upgradeFirebaseDBProperties(componentProperties, srcCompVersion);
+
       } else if (componentType.equals("Pedometer")) {
         srcCompVersion = upgradePedometerProperties(componentProperties, srcCompVersion);
       }
@@ -550,6 +552,7 @@ public final class YoungAndroidFormUpgrader {
     }
     return srcCompVersion;
   }
+
   private static int upgradeSliderProperties(Map<String, JSONValue> componentProperties,
       int srcCompVersion) {
     if (srcCompVersion < 1) {

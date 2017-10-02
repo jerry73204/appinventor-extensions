@@ -1367,7 +1367,6 @@ Blockly.Versioning.AllUpgradeMaps =
 
   }, // End ContactPicker upgraders
 
-
   "DatePicker": {
 
     // AI2: The datepicker dialog was updated to show the current date
