@@ -4,17 +4,17 @@
 #include "lble_setup.hpp"
 #include "Arduino.h"
 
-std::vector<struct gpio_lble_profile> GPIO_LBLE_PROFILES;
+std::vector<struct pin_lble_profile> PIN_LBLE_PROFILES;
 
 void setup_lble()
 {
-    // setup for GPIO
-    GPIO_LBLE_PROFILES.reserve(GPIO_UUID_PROFILES_SIZE);
-    for (int idx = 0; idx < GPIO_UUID_PROFILES_SIZE; ++idx)
+    // setup for PIN
+    PIN_LBLE_PROFILES.reserve(PIN_UUID_PROFILES_SIZE);
+    for (int idx = 0; idx < PIN_UUID_PROFILES_SIZE; ++idx)
     {
         // Note that services and characteristics are registered
         // in the ctor of vector elements
-        GPIO_LBLE_PROFILES.push_back(&GPIO_UUID_PROFILES[idx]);
+        PIN_LBLE_PROFILES.push_back(&PIN_UUID_PROFILES[idx]);
     }
 
     Serial.begin(9600);
@@ -30,14 +30,9 @@ void setup_lble()
 
     // advertise
     LBLEAdvertisementData advertisement;
-    Serial.println("1");
     advertisement.configAsConnectableDevice(DEVICE_NAME);
-    Serial.println("2");
     LBLEPeripheral.setName(DEVICE_NAME);
-    Serial.println("3");
 
     LBLEPeripheral.begin();
-    Serial.println("4");
     LBLEPeripheral.advertise(advertisement);
-    Serial.println("5");
 }

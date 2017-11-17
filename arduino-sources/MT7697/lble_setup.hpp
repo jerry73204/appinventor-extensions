@@ -12,15 +12,15 @@ const int PIN_MODE_DIGITAL_WRITE = 0x03;
 const int PIN_MODE_SERVO         = 0x04;
 const int PIN_MODE_NONE          = 0xFF;
 
-struct gpio_lble_profile
+struct pin_lble_profile
 {
-    const gpio_uuid_profile *uuid_profile;
+    const pin_uuid_profile *uuid_profile;
     int mode = PIN_MODE_NONE;
     LBLEService service;
     LBLECharacteristicInt mode_char;
     LBLECharacteristicBuffer data_char;
 
-    gpio_lble_profile(const gpio_uuid_profile *_uuid_profile)
+    pin_lble_profile(const pin_uuid_profile *_uuid_profile)
         : uuid_profile(_uuid_profile)
         , service(_uuid_profile->service_uuid)
         , mode_char(_uuid_profile->mode_char_uuid, LBLE_READ | LBLE_WRITE)
@@ -32,7 +32,7 @@ struct gpio_lble_profile
     }
 };
 
-extern std::vector<struct gpio_lble_profile> GPIO_LBLE_PROFILES;
+extern std::vector<struct pin_lble_profile> PIN_LBLE_PROFILES;
 
 void setup_lble();
 
