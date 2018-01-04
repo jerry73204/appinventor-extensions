@@ -17,7 +17,4 @@ public interface HandlesEventDispatching {
 
   public boolean dispatchEvent(Component component, String componentName, String eventName,
       Object[] args);
-
-  void dispatchErrorOccurredEvent(Component component, String functionName, int errorCode,
-      Object... args);
 }

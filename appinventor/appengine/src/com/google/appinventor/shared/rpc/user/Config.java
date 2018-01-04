@@ -33,7 +33,6 @@ public class Config implements IsSerializable, Serializable {
   private String guideUrl;
   private String referenceComponentsUrl;
   private String firebaseURL;   // Default Firebase URL
-  private String defaultCloudDBserver;
   private int noop;            // No-op interval
 
   public Config() {
@@ -165,14 +164,6 @@ public class Config implements IsSerializable, Serializable {
 
   public void setFirebaseURL(String url) {
     firebaseURL = url;
-  }
-
-  public void setDefaultCloudDBserver(String server) {
-    defaultCloudDBserver = server;
-  }
-
-  public String getDefaultCloudDBserver() {
-    return defaultCloudDBserver;
   }
 
   public int getNoop() {

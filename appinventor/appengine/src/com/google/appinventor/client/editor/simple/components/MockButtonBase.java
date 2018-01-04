@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2017 MIT, All rights reserved
+// Copyright 2011-2012 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -124,7 +124,7 @@ abstract class MockButtonBase extends MockVisibleComponent {
     switch(shape) {
       case 0:
         // Default Button
-        buttonWidget.getElement().getStyle().clearBorderStyle();
+        DOM.setStyleAttribute(buttonWidget.getElement(), "borderRadius", "0px");
         break;
       case 1:
         // Rounded Button.
@@ -159,10 +159,10 @@ abstract class MockButtonBase extends MockVisibleComponent {
       return;
     }
     if (MockComponentsUtil.isDefaultColor(text)) {
-      MockComponentsUtil.resetWidgetBackgroundColor(buttonWidget);
-    } else {
-      MockComponentsUtil.setWidgetBackgroundColor(buttonWidget, text);
+      // CSS background-color for ode-SimpleMockButton (copied from Ya.css)
+      text = "&HFFE8E8E8";
     }
+    MockComponentsUtil.setWidgetBackgroundColor(buttonWidget, text);
   }
 
   /*
@@ -242,10 +242,9 @@ abstract class MockButtonBase extends MockVisibleComponent {
    */
   private void setTextColorProperty(String text) {
     if (MockComponentsUtil.isDefaultColor(text)) {
-      MockComponentsUtil.resetWidgetTextColor(buttonWidget);
-    } else {
-      MockComponentsUtil.setWidgetTextColor(buttonWidget, text);
+      text = "&HFF000000";  // black
     }
+    MockComponentsUtil.setWidgetTextColor(buttonWidget, text);
   }
 
   private final void updatePreferredSizeOfButton() {

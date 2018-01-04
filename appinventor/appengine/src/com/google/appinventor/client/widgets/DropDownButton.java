@@ -1,8 +1,3 @@
-// -*- mode: java; c-basic-offset: 2; -*-
-// Copyright © 2013-2017 Massachusetts Institute of Technology, All rights reserved.
-// Released under the Apache License, Version 2.0
-// http://www.apache.org/licenses/LICENSE-2.0
-
 package com.google.appinventor.client.widgets;
 
 import com.google.appinventor.client.utils.PZAwarePositionCallback;
@@ -31,7 +26,7 @@ public class DropDownButton extends TextButton {
 
   public static class DropDownItem {
     private final String widgetName;
-    private String caption;
+    private final String caption;
     private final Command command;
 
     public DropDownItem(String widgetName, String caption, Command command) {
@@ -204,12 +199,6 @@ public class DropDownButton extends TextButton {
         break;
       }
     }
-  }
-
-  public void replaceLastItem(DropDownItem item) {
-    menu.removeItem(items.get(items.size()-1));
-    items.remove(items.size()-1);
-    items.add(menu.addItem(item.caption, true, item.command));
   }
 
   public void setCaption(String caption) {

@@ -39,8 +39,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import com.google.appinventor.components.runtime.util.IOUtils;
-
 /**
  * Exposes application secondary dex files as files in the application data
  * directory.
@@ -337,7 +335,7 @@ final class MultiDexExtractor {
                         "\" to \"" + extractTo.getAbsolutePath() + "\"");
             }
         } finally {
-            IOUtils.closeQuietly(TAG, in);
+            closeQuietly(in);
             tmp.delete(); // return status ignored
         }
     }
@@ -360,6 +358,17 @@ final class MultiDexExtractor {
             Log.w(TAG, "Got an IOException trying to open zip file: " + file.getAbsolutePath(), ex);
         }
         return false;
+    }
+
+    /**
+     * Closes the given {@code Closeable}. Suppresses any IO exceptions.
+     */
+    private static void closeQuietly(Closeable closeable) {
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            Log.w(TAG, "Failed to close resource", e);
+        }
     }
 
     // The following is taken from SharedPreferencesCompat to avoid having a dependency of the
