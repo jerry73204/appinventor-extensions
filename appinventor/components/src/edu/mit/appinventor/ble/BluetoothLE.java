@@ -32,7 +32,6 @@ import com.google.appinventor.components.runtime.Form;
 import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.SdkLevel;
 import com.google.appinventor.components.runtime.util.YailList;
-import com.google.common.collect.Lists;
 import gnu.lists.FString;
 
 import java.io.UnsupportedEncodingException;
@@ -52,7 +51,7 @@ import java.util.Set;
  * @author William Byrne (will2596@gmail.com) (minor bugfixes)
  */
 
-@DesignerComponent(version = 2,
+@DesignerComponent(version = 20171107,
     description = "Bluetooth Low Energy, also referred to as Bluetooth LE " +
         "or simply BLE, is a new communication protocol similar to classic Bluetooth except " +
         "that it is designed to consume less power while maintaining comparable " +
@@ -63,6 +62,7 @@ import java.util.Set;
         "issues with Google's Bluetooth LE support prior to Android 5.0.",
     category = ComponentCategory.EXTENSION,
     nonVisible = true,
+    helpUrl = "http://iot.appinventor.mit.edu/#/bluetoothle/bluetoothleintro",
     iconName = "images/bluetooth.png")
 @SimpleObject(external = true)
 @UsesPermissions(permissionNames = "android.permission.BLUETOOTH, " + "android.permission.BLUETOOTH_ADMIN,"
@@ -1706,7 +1706,8 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   public void ExWriteByteValues(String serviceUuid, String characteristicUuid, boolean signed,
                                 List<Integer> values) {
     if (inner != null) {
-      inner.WriteByteValues(serviceUuid, characteristicUuid, signed, values);
+      inner.WriteByteValues(serviceUuid, characteristicUuid, signed,
+          toList(Integer.class, values, 1));
     }
   }
 
@@ -1860,7 +1861,8 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   public void ExWriteShortValues(String serviceUuid, String characteristicUuid, boolean signed,
                                  List<Integer> values) {
     if (inner != null) {
-      inner.WriteShortValues(serviceUuid, characteristicUuid, signed, values);
+      inner.WriteShortValues(serviceUuid, characteristicUuid, signed,
+          toList(Integer.class, values, 2));
     }
   }
 
@@ -1974,7 +1976,8 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   public void ExWriteIntegerValues(String serviceUuid, String characteristicUuid, boolean signed,
                                    List<Long> values) {
     if (inner != null) {
-      inner.WriteIntegerValues(serviceUuid, characteristicUuid, signed, values);
+      inner.WriteIntegerValues(serviceUuid, characteristicUuid, signed,
+          toList(Long.class, values, 4));
     }
   }
 
@@ -2091,7 +2094,8 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   public void ExWriteFloatValues(String serviceUuid, String characteristicUuid, boolean shortFloats,
                                  List<Float> values) {
     if (inner != null) {
-      inner.WriteFloatValues(serviceUuid, characteristicUuid, shortFloats, values);
+      inner.WriteFloatValues(serviceUuid, characteristicUuid, shortFloats,
+          toList(Float.class, values, shortFloats ? 2 : 4));
     }
   }
 
@@ -2208,7 +2212,8 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   public void ExWriteStringValues(String serviceUuid, String characteristicUuid, boolean utf16,
                                   List<String> values) {
     if (inner != null) {
-      inner.WriteStringValues(serviceUuid, characteristicUuid, utf16, values);
+      inner.WriteStringValues(serviceUuid, characteristicUuid, utf16,
+          toList(String.class, values, utf16 ? 2 : 1));
     }
   }
 
@@ -2330,6 +2335,14 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
       Iterator<?> i = ((YailList) value).iterator();
       i.next();  // skip *list* symbol
       return listFromIterator(tClass, i);
+    } else if (Number.class.isAssignableFrom(tClass)) {
+      if (value instanceof FString) {
+        return toList(tClass, stringToNumber(value.toString()), size);
+      } else if (! (value instanceof Collection)) {
+        return toList(tClass, Collections.singletonList(value), size);
+      } else {
+        return listFromIterator(tClass, ((Collection<?>) value).iterator());
+      }
     } else if (value instanceof FString) {  // needs to come before List
       // this assumes that the string is being cast to a list of UTF-8 bytes
       return toList(tClass, value.toString(), size);
@@ -2351,6 +2364,7 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
         return Collections.emptyList();
       }
     } else {
+      Log.i("BLE", "Is number assignable from " + tClass + "? " + Number.class.isAssignableFrom(tClass));
       throw new ClassCastException("Unable to convert " + value + " to list");
     }
   }
@@ -2368,11 +2382,11 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
   private static <T> List<T> listFromIterator(Class<T> tClass, Iterator<?> i) {
     // Primitive types cannot be cast to one another using boxed values...
     if (tClass.equals(Integer.class)) {
-      return (List<T>) toIntList((List<? extends Number>)(List) Lists.newArrayList(i));
+      return (List<T>) toIntList((List<? extends Number>)(List) newArrayList(i));
     } else if (tClass.equals(Long.class)) {
-      return (List<T>) toLongList((List<? extends Number>)(List) Lists.newArrayList(i));
+      return (List<T>) toLongList((List<? extends Number>)(List) newArrayList(i));
     } else if (tClass.equals(Float.class)) {
-      return (List<T>) toFloatList((List<? extends Number>)(List) Lists.newArrayList(i));
+      return (List<T>) toFloatList((List<? extends Number>)(List) newArrayList(i));
     }
     List<T> result = new ArrayList<T>();
     while (i.hasNext()) {
@@ -2425,6 +2439,18 @@ public class BluetoothLE extends AndroidNonvisibleComponent implements Component
       result.add((int) b);
     }
     return result;
+  }
+
+  private static <T> List<T> newArrayList(Iterator<? extends T> it) {
+    List<T> result = new ArrayList<T>();
+    while (it.hasNext()) {
+      result.add(it.next());
+    }
+    return result;
+  }
+
+  private static Number stringToNumber(String value) {
+    return Double.parseDouble(value);
   }
 }
 
