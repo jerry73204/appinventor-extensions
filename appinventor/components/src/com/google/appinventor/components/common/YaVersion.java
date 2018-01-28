@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2017 MIT, All rights reserved
+// Copyright 2011-2018 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -419,8 +419,10 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 166:
   // - MAP_COMPONENT_VERSION was incremented to 3
   // - FEATURE_COLLECTION_COMPONENT_VERSION was incremented to 2
+  // For YOUNG_ANDROID_VERSION 167:
+  // - FORM_COMPONENT_VERSION was incremented to 23
 
-  public static final int YOUNG_ANDROID_VERSION = 166;
+  public static final int YOUNG_ANDROID_VERSION = 167;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -732,7 +734,11 @@ public class YaVersion {
   // - The Screen.PrimaryColor property was added
   // - The Screen.PrimaryColorDark property was added
   // - The Screen.Theme property was added
-  public static final int FORM_COMPONENT_VERSION = 21;
+  // For FORM_COMPONENT_VERSION 22:
+  // - The Classic option for themes was added
+  // For FORM_COMPONENT_VERSION 23:
+  // - The ActionBar property was deprecated
+  public static final int FORM_COMPONENT_VERSION = 23;
 
   // For FUSIONTABLESCONTROL_COMPONENT_VERSION 2:
   // - The Fusiontables API was migrated from SQL to V1
@@ -1155,10 +1161,10 @@ public class YaVersion {
 
   public static final String ACCEPTABLE_COMPANION_PACKAGE = "edu.mit.appinventor.aicompanion3";
 
-  public static final String PREFERRED_COMPANION = "2.45";
+  public static final String PREFERRED_COMPANION = "2.46";
   public static final String COMPANION_UPDATE_URL = "";
   public static final String COMPANION_UPDATE_URL1 = "";
-  public static final String [] ACCEPTABLE_COMPANIONS = { "2.45" };
+  public static final String [] ACCEPTABLE_COMPANIONS = { "2.46" };
 
   // Splash Screen Values
   public static final int SPLASH_SURVEY = 1;

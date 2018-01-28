@@ -122,8 +122,8 @@ public class AARLibrary {
    */
   public AARLibrary(final File aar) {
     aarPath = aar;
-    String temp = aar.getAbsolutePath();
-    name = temp.substring(temp.lastIndexOf('/'), temp.length()-4);
+    String temp = aar.getName();
+    name = temp.substring(0, temp.length()-4);
   }
 
   public File getFile() {
@@ -250,7 +250,8 @@ public class AARLibrary {
             input = zip.getInputStream(entry);
             IOUtils.copy(input, output);
           } finally {
-            IOUtils.closeQuietly(input, output);
+            IOUtils.closeQuietly(input);
+            IOUtils.closeQuietly(output);
           }
           catalog(target);
         }
