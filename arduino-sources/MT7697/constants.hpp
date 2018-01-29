@@ -1,5 +1,5 @@
 // -*- mode: java; c-basic-offset: 2; -*-
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2018 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 // author jerry73204@gmail.com (Lin, Hsiang-Jui)
@@ -10,6 +10,7 @@
 
 #define PIN_UUID_PROFILES_SIZE 14
 #define SERVO_SIZE 14
+#define SEND_PERIOD 300
 #define BTN_PIN 6
 #define LED_PIN 7
 
