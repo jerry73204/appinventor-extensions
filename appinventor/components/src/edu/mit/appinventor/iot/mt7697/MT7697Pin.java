@@ -108,20 +108,20 @@ public class MT7697Pin extends MT7697ExtensionBase {
           return;
 
         if (mMode == MODE_ANALOG_INPUT || mMode == MODE_DIGITAL_INPUT) {
-          bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, false, mMode);
+          // bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, false, mMode);
           bleConnection.ExReadIntegerValues(mServiceUuid, mDataCharUuid, false, inputUpdateCallback);
 
-        } else if (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT || mMode == MODE_SERVO) {
-          bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, false, mMode);
+        }//  else if (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT || mMode == MODE_SERVO) {
+        //   bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, false, mMode);
 
-          if (mData <= 0) {
-            int dataToSend = mData;
-            if (mMode == MODE_DIGITAL_OUTPUT && dataToSend != 0)
-              dataToSend = -255;
+        //   if (mData <= 0) {
+        //     int dataToSend = mData;
+        //     if (mMode == MODE_DIGITAL_OUTPUT && dataToSend != 0)
+        //       dataToSend = -255;
 
-            bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, false, dataToSend);
-          }
-        }
+        //     bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, false, dataToSend);
+        //   }
+        // }
       }
     };
 
@@ -204,30 +204,29 @@ public class MT7697Pin extends MT7697ExtensionBase {
     if (mode.equals(STRING_ANALOG_INPUT)) {
       mMode = MODE_ANALOG_INPUT;
       mData = -1;
-    }
-    else if (mode.equals(STRING_ANALOG_OUTPUT)) {
+    } else if (mode.equals(STRING_ANALOG_OUTPUT)) {
       mMode = MODE_ANALOG_OUTPUT;
       mData = 1;
-    }
-    else if (mode.equals(STRING_DIGITAL_INPUT)) {
+    } else if (mode.equals(STRING_DIGITAL_INPUT)) {
       mMode = MODE_DIGITAL_INPUT;
       mData = -1;
-    }
-    else if (mode.equals(STRING_DIGITAL_OUTPUT)) {
+    } else if (mode.equals(STRING_DIGITAL_OUTPUT)) {
       mMode = MODE_DIGITAL_OUTPUT;
       mData = 1;
-    }
-    else if (mode.equals(STRING_SERVO)) {
+    } else if (mode.equals(STRING_SERVO)) {
       mMode = MODE_SERVO;
       mData = 1;
-    }
-    else
+    } else {
       form.dispatchErrorOccurredEvent(this,
                                       "Mode",
                                       ErrorMessages.ERROR_EXTENSION_ERROR,
                                       ERROR_INVALID_MODE_ARGUMENT,
                                       LOG_TAG,
                                       "Invalid mode value");
+      return;
+    }
+
+    bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, false, mMode);
   }
 
   /**
@@ -304,12 +303,14 @@ public class MT7697Pin extends MT7697ExtensionBase {
       // trim value
       value = value >= 0 ? value : 0;
       value = value <= 255 ? value : 255;
-      mData = -value;
+      // mData = -value;
+      bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, false, -value);
     }
     else if (mMode == MODE_SERVO) {
       value = value >= 0 ? value : 0;
       value = value <= 180 ? value : 180;
-      mData = -value;
+      // mData = -value;
+      bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, false, -value);
     }
     else {
       form.dispatchErrorOccurredEvent(this,
