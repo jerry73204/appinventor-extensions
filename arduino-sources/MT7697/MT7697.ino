@@ -65,6 +65,7 @@ void loop()
                         servo[pin].detach();
                         break;
                     case MODE_ANALOG_OUTPUT:
+                        break;
                     case MODE_DIGITAL_OUTPUT:
                         pinMode(pin, OUTPUT);
                         servo[pin].detach();
@@ -112,7 +113,7 @@ void loop()
                     {
                         data = lble_ref.data_char->getValue();
                         data *= -1;
-                        analogWrite(pin, data);
+                        digitalWrite(pin, (data >= 1) ? HIGH : LOW);
                         sprintf(info, "Pin %d in digital output mode, receive data %d", pin, data);
                         Serial.println(info);
                     }
