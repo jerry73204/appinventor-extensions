@@ -26,6 +26,29 @@ import java.util.List;
 
 @SimpleObject
 public abstract class MT7697ExtensionBase extends AndroidNonvisibleComponent {
+
+  // constants for MT7697 components
+  protected static final int ERROR_INVALID_PIN_ARGUMENT  = 9101;
+  protected static final int ERROR_INVALID_MODE_ARGUMENT = 9102;
+  protected static final int ERROR_INVALID_WRITE_VALUE   = 9103;
+  protected static final int ERROR_INVALID_STATE         = 9104;
+  protected static final int ERROR_INVALID_DURATION      = 9105;
+
+  protected static final String STRING_ANALOG_INPUT   = "analog input";
+  protected static final String STRING_ANALOG_OUTPUT  = "analog output";
+  protected static final String STRING_DIGITAL_INPUT  = "digital input";
+  protected static final String STRING_DIGITAL_OUTPUT = "digital output";
+  protected static final String STRING_SERVO          = "servo";
+
+  protected static final int MODE_UNSET          = 0;
+  protected static final int MODE_ANALOG_INPUT   = 1;
+  protected static final int MODE_ANALOG_OUTPUT  = 2;
+  protected static final int MODE_DIGITAL_INPUT  = 3;
+  protected static final int MODE_DIGITAL_OUTPUT = 4;
+  protected static final int MODE_SERVO          = 5;
+  protected static final int MODE_ULTRASONIC     = 6;
+  protected static final int MODE_BUZZER         = 7;
+
   protected BluetoothLE bleConnection = null;
 
   MT7697ExtensionBase(Form form) {

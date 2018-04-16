@@ -26,50 +26,40 @@ import static edu.mit.appinventor.iot.mt7697.Constants.PIN_UUID_LOOKUP;
 import static edu.mit.appinventor.iot.mt7697.Constants.PIN_SERVICE_UUID;
 
 /**
- * The component controls a pin I/O on MT7697 boards.
+ * The component controls an ultrasonic sensor on MT7697 boards.
  *
  * @author jerry73204@gmail.com (Lin, Hsiang-Jui)
  * @author az6980522@gmail.com (Yuan, Yu-Yuan)
  */
 @DesignerComponent(version = 2,
-                   description = "The MT7697Pin component lets users control the pin from their AppInventor apps.",
+                   description = "The MT7697Ultrasonic component lets users control an ultrasonic sensor connected to MT7697 boards.",
                    category = ComponentCategory.EXTENSION,
                    nonVisible = true,
                    iconName = "aiwebres/mt7697.png")
 @SimpleObject(external = true)
-public class MT7697Pin extends MT7697ExtensionBase {
+public class MT7697Ultrasonic extends MT7697ExtensionBase {
   // constants
   private static final int TIMER_INTERVAL = 500; // ms
-  private static final int INIT_INPUT_DATA  = -1;
-  private static final int INIT_OUTPUT_DATA =  1;
-  private static final String LOG_TAG = "MT7697Pin";
-  private static final String DEFAULT_PIN = "2";
-  private static final String DEFAULT_MODE = STRING_ANALOG_INPUT;
+  private static final String LOG_TAG = "MT7697Ultrasonic";
+  private static final String DEFAULT_PIN = "8";
+  private static final String DEFAULT_UNIT = "cm";
   private static final String[] VALID_PINS = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"};
 
   // variable
   private String mPin = DEFAULT_PIN;
-  private int mMode = MODE_UNSET;
+  private final int mMode = MODE_ULTRASONIC; // unchanged in this component
+  private String mUnit = DEFAULT_UNIT;
   private String mModeCharUuid;
   private String mDataCharUuid;
-  private int mData;
-  private static final String mServiceUuid = PIN_SERVICE_UUID; // unchanged in current implementation
+  private final String mServiceUuid = PIN_SERVICE_UUID; // unchanged in current implementation
 
   final BluetoothLE.BLEResponseHandler<Long> inputUpdateCallback = new BluetoothLE.BLEResponseHandler<Long>() {
     @Override
     public void onReceive(String serviceUUID, String characteristicUUID, List<Long> values) {
       int receivedValue = values.get(0).intValue();
-      if (receivedValue < 0)
-        return;
 
-      if (mMode == MODE_DIGITAL_INPUT) {
-        mData = receivedValue == 0 ? 0 : 1;
-        InputUpdated(mData);
-
-      } else if (mMode == MODE_ANALOG_INPUT) {
-        mData = receivedValue;
-        InputUpdated(mData);
-      }
+      if (receivedValue >= 0)
+        InputUpdated((double) receivedValue);
     }
   };
 
@@ -82,24 +72,17 @@ public class MT7697Pin extends MT7697ExtensionBase {
         return;
 
       // write mode
-      if (mMode != MODE_UNSET) {
-        bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
-
-        // write data
-        if ( (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT || mMode == MODE_SERVO) && (mData != INIT_OUTPUT_DATA) )
-          bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
-      }
+      bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
 
       handler.postDelayed(this, TIMER_INTERVAL);
     }
   };
 
-  public MT7697Pin(Form form) {
+  public MT7697Ultrasonic(Form form) {
     super(form);
 
     // initialize properties
     Pin(DEFAULT_PIN);
-    Mode(DEFAULT_MODE);
 
     // start periodic task
     handler.post(periodicTask);
@@ -151,12 +134,8 @@ public class MT7697Pin extends MT7697ExtensionBase {
     mDataCharUuid = PIN_UUID_LOOKUP.get(mPin).mDataCharUuid;
 
     // update mode and data
-    if (IsSupported()) {
+    if (IsSupported())
       bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode); // write the mode
-
-      if ( (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT) && (mData <= 0) )
-        bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
-    }
   }
 
   /**
@@ -169,111 +148,29 @@ public class MT7697Pin extends MT7697ExtensionBase {
   }
 
   /**
-   * Set the target pin mode. To set this property in blocky editor, assign text value
-   * in either one of "analog input", "analog output", "ditital input", "ditigal output",
-   * or "servo".
+   * Set the unit for distance.
    *
    * __Parameters__:
    *
-   *     * mode (_text_); The mode description set on the target pin.
+   *     * unit (_text_); in either "cm" or "inch"
    *
-   * @param The mode description set on the target pin.
+   * @param The target pin number.
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHOICES,
-                    defaultValue = DEFAULT_MODE,
-                    editorArgs = { STRING_ANALOG_INPUT, STRING_ANALOG_OUTPUT, STRING_DIGITAL_INPUT, STRING_DIGITAL_OUTPUT, STRING_SERVO })
+                    defaultValue = DEFAULT_UNIT,
+                    editorArgs = {"cm", "inch"})
   @SimpleProperty
-  public void Mode(String mode) {
-    if (mode.equals(STRING_ANALOG_INPUT)) {
-      mMode = MODE_ANALOG_INPUT;
-      mData = INIT_INPUT_DATA;
-    } else if (mode.equals(STRING_ANALOG_OUTPUT)) {
-      mMode = MODE_ANALOG_OUTPUT;
-      mData = INIT_OUTPUT_DATA;
-    } else if (mode.equals(STRING_DIGITAL_INPUT)) {
-      mMode = MODE_DIGITAL_INPUT;
-      mData = INIT_INPUT_DATA;
-    } else if (mode.equals(STRING_DIGITAL_OUTPUT)) {
-      mMode = MODE_DIGITAL_OUTPUT;
-      mData = INIT_OUTPUT_DATA;
-    } else if (mode.equals(STRING_SERVO)) {
-      mMode = MODE_SERVO;
-      mData = INIT_OUTPUT_DATA;
-    } else {
-      form.dispatchErrorOccurredEvent(this,
-                                      "Mode",
-                                      ErrorMessages.ERROR_EXTENSION_ERROR,
-                                      ERROR_INVALID_MODE_ARGUMENT,
-                                      LOG_TAG,
-                                      "Invalid mode value");
-      return;
-    }
-
-    if (IsSupported())
-      bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
+  public void Unit(String unit) {
+    mUnit = unit;
   }
 
   /**
-   * Get the target pin mode.
+   * Get the unit for distance.
    */
   @SimpleProperty(category = PropertyCategory.BEHAVIOR,
                   description = "The pin mode on the MT7697 board that the device is wired in to.")
-  public String Mode() {
-    switch (mMode) {
-    case MODE_ANALOG_INPUT:
-      return STRING_ANALOG_INPUT;
-
-    case MODE_ANALOG_OUTPUT:
-      return STRING_ANALOG_OUTPUT;
-
-    case MODE_DIGITAL_INPUT:
-      return STRING_DIGITAL_INPUT;
-
-    case MODE_DIGITAL_OUTPUT:
-      return STRING_DIGITAL_OUTPUT;
-
-    case MODE_SERVO:
-      return STRING_SERVO;
-
-    default:
-      throw new IllegalArgumentException();
-    }
-  }
-
-  /**
-   * Set the output intensity of a pin on MT7697. In analog output mode, the argument should be
-   * non-negative and not exceed 255, otherwise it will be trimmed. In digital output mode, zero
-   * and non-zero argument are respectively treated as LOW and HIGH outputs. In servo mode, the
-   * argument should be in range from 0 to 180.
-   *
-   * __Parameters__:
-   *
-   *     * value (_number_); The output intensity of the target pin.
-   *
-   * @param The output intensity of the target pin.
-   */
-  @SimpleFunction
-  public void Write(int value) {
-    if (!IsSupported())
-      return;
-
-    if (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT) {
-      // trim value
-      value = value >= 0 ? value : 0;
-      value = value <= 255 ? value : 255;
-      mData = -value;
-    } else if (mMode == MODE_SERVO) {
-      value = value >= 0 ? value : 0;
-      value = value <= 180 ? value : 180;
-      mData = -value;
-    } else {
-      form.dispatchErrorOccurredEvent(this,
-                                      "Write",
-                                      ErrorMessages.ERROR_EXTENSION_ERROR,
-                                      ERROR_INVALID_STATE,
-                                      LOG_TAG,
-                                      "Cannot call Write() on non-output or non-servo mode");
-    }
+  public String Unit() {
+    return mUnit;
   }
 
   /**
@@ -316,12 +213,15 @@ public class MT7697Pin extends MT7697ExtensionBase {
    *
    * __Parameters__:
    *
-   *     * value (_number_); The intensity which is read from the input pin.
+   *     * value (_number_); The distance percieced by the sensor.
    *
-   * @param The intensity which is read from the input pin.
+   * @param The distance percieced by the sensor.
    */
   @SimpleEvent
-  public void InputUpdated(final int value) {
+  public void InputUpdated(double value) {
+    if (mUnit.equals("inch"))
+      value *= 0.393701;
+
     EventDispatcher.dispatchEvent(this, "InputUpdated", value);
   }
 }
