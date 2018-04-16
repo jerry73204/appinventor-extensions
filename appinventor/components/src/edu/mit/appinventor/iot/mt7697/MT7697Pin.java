@@ -47,7 +47,7 @@ public class MT7697Pin extends MT7697ExtensionBase {
   private static final int ERROR_INVALID_WRITE_VALUE   = 9103;
   private static final int ERROR_INVALID_STATE         = 9104;
 
-  private static final int TIMER_INTERVAL = 1000; // ms
+  private static final int TIMER_INTERVAL = 500; // ms
 
   private static final String LOG_TAG = "MT7697Pin";
 
@@ -56,12 +56,16 @@ public class MT7697Pin extends MT7697ExtensionBase {
   private static final String STRING_DIGITAL_INPUT  = "digital input";
   private static final String STRING_DIGITAL_OUTPUT = "digital output";
   private static final String STRING_SERVO          = "servo";
+  private static final String STRING_ULTRASONIC     = "ultrasonic sensor";
+  private static final String STRING_BUZZER         = "buzzer";
   private static final int MODE_UNSET          = 0;
   private static final int MODE_ANALOG_INPUT   = 1;
   private static final int MODE_ANALOG_OUTPUT  = 2;
   private static final int MODE_DIGITAL_INPUT  = 3;
   private static final int MODE_DIGITAL_OUTPUT = 4;
   private static final int MODE_SERVO          = 5;
+  private static final int MODE_ULTRASONIC     = 6;
+  private static final int MODE_BUZZER         = 7;
 
   private static final String DEFAULT_PIN = "2";
   private static final String DEFAULT_MODE = STRING_ANALOG_INPUT;
@@ -90,6 +94,9 @@ public class MT7697Pin extends MT7697ExtensionBase {
           InputUpdated(mData);
 
         } else if (mMode == MODE_ANALOG_INPUT) {
+          mData = receivedValue;
+          InputUpdated(mData);
+        } else if (mMode == MODE_ULTRASONIC) {
           mData = receivedValue;
           InputUpdated(mData);
         }
@@ -126,7 +133,7 @@ public class MT7697Pin extends MT7697ExtensionBase {
 
   /**
    * Set the target pin by pin number. To set this property in blocky editor, assign text value
-   * in either one of "2", "3", "4", "5", "6", "7", "10", "11", "12", "13", "14", "15", "16" or "17".
+   * in either one of "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" or "17".
    *
    * __Parameters__:
    *
@@ -136,11 +143,11 @@ public class MT7697Pin extends MT7697ExtensionBase {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHOICES,
                     defaultValue = DEFAULT_PIN,
-                    editorArgs = {"2", "3", "4", "5", "6", "7", "10", "11", "12", "13", "14", "15", "16", "17"})
+                    editorArgs = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"})
   @SimpleProperty
   public void Pin(String pin) {
     // duplicated with editorArgs, but we have to make compiler happy
-    String[] validPins = {"2", "3", "4", "5", "6", "7", "10", "11", "12", "13", "14", "15", "16", "17"};
+    String[] validPins = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"};
     boolean isValidPin = false;
 
     // sanity check
@@ -201,7 +208,7 @@ public class MT7697Pin extends MT7697ExtensionBase {
    */
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_CHOICES,
                     defaultValue = DEFAULT_MODE,
-                    editorArgs = { STRING_ANALOG_INPUT, STRING_ANALOG_OUTPUT, STRING_DIGITAL_INPUT, STRING_DIGITAL_OUTPUT, STRING_SERVO })
+                    editorArgs = { STRING_ANALOG_INPUT, STRING_ANALOG_OUTPUT, STRING_DIGITAL_INPUT, STRING_DIGITAL_OUTPUT, STRING_SERVO, STRING_ULTRASONIC, STRING_BUZZER })
   @SimpleProperty
   public void Mode(String mode) {
     if (mode.equals(STRING_ANALOG_INPUT)) {
@@ -218,6 +225,12 @@ public class MT7697Pin extends MT7697ExtensionBase {
       mData = 1;
     } else if (mode.equals(STRING_SERVO)) {
       mMode = MODE_SERVO;
+      mData = 1;
+    } else if (mode.equals(STRING_ULTRASONIC)) {
+      mMode = MODE_ULTRASONIC;
+      mData = 1;
+    } else if (mode.equals(STRING_BUZZER)) {
+      mMode = MODE_BUZZER;
       mData = 1;
     } else {
       form.dispatchErrorOccurredEvent(this,
@@ -254,6 +267,12 @@ public class MT7697Pin extends MT7697ExtensionBase {
 
     case MODE_SERVO:
       return STRING_SERVO;
+
+    case MODE_ULTRASONIC:
+      return STRING_ULTRASONIC;
+
+    case MODE_BUZZER:
+      return STRING_BUZZER;
     }
     assert false;
     return null;
@@ -296,6 +315,10 @@ public class MT7697Pin extends MT7697ExtensionBase {
     else if (mMode == MODE_SERVO) {
       value = value >= 0 ? value : 0;
       value = value <= 180 ? value : 180;
+      mData = -value;
+      bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
+    }
+    else if (mMode == MODE_BUZZER) {
       mData = -value;
       bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
     }
