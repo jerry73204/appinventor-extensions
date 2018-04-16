@@ -8,9 +8,9 @@
 #ifndef __MT7697_CONSTANTS_HPP__
 #define __MT7697_CONSTANTS_HPP__
 
-#define PIN_UUID_PROFILES_SIZE 14
+#define PIN_UUID_PROFILES_SIZE 16
 #define SERVO_SIZE 14
-#define SEND_PERIOD 300
+#define SEND_PERIOD 10
 #define BTN_PIN 6
 #define LED_PIN 7
 
@@ -20,9 +20,11 @@
 #define MODE_DIGITAL_INPUT  3
 #define MODE_DIGITAL_OUTPUT 4
 #define MODE_SERVO          5
+#define MODE_SONIC          6
+#define MODE_BUZZER         7
 
 
-static const char DEVICE_NAME[] = "MT7697 for AI2";
+static const char DEVICE_NAME[]          = "MT7697 for AI2";
 
 static const char PIN_SERVICE_UUID[]     = "ccb7be00-77bd-4349-86a6-14cc7673ca00";
 
@@ -45,12 +47,12 @@ static const char PIN07_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca07
 static const char PIN07_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca07";
 
 // reserve for i2c
-//
-// static const char PIN08_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca08";
-// static const char PIN08_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca08";
-//
-// static const char PIN09_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca09";
-// static const char PIN09_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca09";
+
+static const char PIN08_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca08";
+static const char PIN08_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca08";
+
+static const char PIN09_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca09";
+static const char PIN09_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca09";
 
 static const char PIN10_MODE_CHAR_UUID[] = "ccb7be00-77bd-4349-86a6-14cc7673ca10";
 static const char PIN10_DATA_CHAR_UUID[] = "ccb7be01-77bd-4349-86a6-14cc7673ca10";

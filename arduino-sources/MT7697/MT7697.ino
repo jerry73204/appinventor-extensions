@@ -53,6 +53,8 @@ void loop()
             const int pin = lble_ref.pin;
             char info[64];
             int data;
+            int duration;
+            int frequency;
 
             if (lble_ref.mode_char->isWritten())
             {
@@ -65,6 +67,7 @@ void loop()
                         servo[pin].detach();
                         break;
                     case MODE_ANALOG_OUTPUT:
+                        break;
                     case MODE_DIGITAL_OUTPUT:
                         pinMode(pin, OUTPUT);
                         servo[pin].detach();
@@ -93,7 +96,7 @@ void loop()
                     {
                         lble_ref.data_char->setValue(data);
                         timer = millis();
-                        sprintf(info, "Pin %d in digital input mode, send data %d", pin, data);
+                        sprintf(info, "pin %d in digital input mode, send data %d", pin, data);
                         Serial.println(info);
                     }
                     break;
@@ -112,7 +115,7 @@ void loop()
                     {
                         data = lble_ref.data_char->getValue();
                         data *= -1;
-                        analogWrite(pin, data);
+                        digitalWrite(pin, (data >= 1) ? HIGH : LOW);
                         sprintf(info, "Pin %d in digital output mode, receive data %d", pin, data);
                         Serial.println(info);
                     }
@@ -127,6 +130,40 @@ void loop()
                         Serial.println(info);
                     }
                     break;
+                case MODE_SONIC:
+                    pinMode(pin, OUTPUT);
+                    digitalWrite(pin, LOW);
+                    delayMicroseconds(2);
+                    digitalWrite(pin, HIGH);
+                    delayMicroseconds(5);
+                    digitalWrite(pin, LOW);
+                    pinMode(pin, INPUT);
+                    duration = pulseIn(pin, HIGH);
+                    data = duration*0.034/2;
+                    // Serial.print("Distance: ");
+                    // Serial.println(distance);
+                    if ((millis() - timer) >= SEND_PERIOD)
+                    {
+                        lble_ref.data_char->setValue(data);
+                        timer = millis();
+                        sprintf(info, "Pin %d in ultrasonic mode, send data %d", pin, data);
+                        Serial.println(info);
+                    }
+                    break;
+                case MODE_BUZZER:
+                    if (lble_ref.data_char->isWritten())
+                    {
+                        data = lble_ref.data_char->getValue();
+                        data *= -1;
+                        // first 2 bytes is frequency and the last 2 bytes is duration
+                        frequency = data >> 16;
+                        duration = data & 0xffff;
+                        tone(pin, frequency, duration);
+                        sprintf(info, "Pin %d in buzzer mode, receive frequency: %d, duration: %d", pin, frequency, duration);
+                        Serial.println(info);
+                    }
+                    break;
+                    
                 // default:
                 //     sprintf(info, "Pin %d in invalid mode", pin);
                 //     Serial.println(info);
