@@ -41,15 +41,16 @@ public class MT7697Buzzer extends MT7697ExtensionBase {
   // constants
   private static final int TIMER_INTERVAL = 500; // ms
   private static final String LOG_TAG = "MT7697Buzzer";
-  private static final String DEFAULT_PIN = "10";
+  private static final String DEFAULT_PIN = "3";
   private static final String[] VALID_PINS = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"};
+  private static final int MIN_FREQ = 20;
+  private static final int MAX_FREQ = 20000;
 
   // variable
   private String mPin = DEFAULT_PIN;
   private static int mMode = MODE_BUZZER; // unchanged in this component
   private String mModeCharUuid;
   private String mDataCharUuid;
-  private int mFreq;
   private static final String mServiceUuid = PIN_SERVICE_UUID; // unchanged in current implementation
 
   Handler handler = new Handler();
@@ -57,11 +58,10 @@ public class MT7697Buzzer extends MT7697ExtensionBase {
   Runnable periodicTask = new Runnable() {
     @Override
     public void run() {
-      if (!IsSupported())
-        return;
-
-      // write mode
-      bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
+      if (IsSupported()) {
+        // write mode
+        bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
+      }
 
       handler.postDelayed(this, TIMER_INTERVAL);
     }
@@ -134,57 +134,43 @@ public class MT7697Buzzer extends MT7697ExtensionBase {
   }
 
   /**
-   * Set the sound frequency.
-   *
-   * __Parameters__:
-   *
-   *     * frequency (_number_); The sound frequency in Hz.
-   *
-   * @param The sound frequency in Hz.
-   */
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_NON_NEGATIVE_INTEGER,
-                    defaultValue = "440")
-  @SimpleProperty
-  public void Frequency(int frequency) {
-    // TODO range check
-    mFreq = frequency;
-  }
-
-  /**
-   * Get the sound frequency.
-   */
-  @SimpleProperty(category = PropertyCategory.BEHAVIOR,
-                  description = "The frequency of buzzer sound.")
-  public int Frequency() {
-    return mFreq;
-  }
-
-  /**
    * Cause the buzzer make sound for a period of time.
    *
    * __Parameters__:
    *
-   *     * duration (_number_); The length in time in seconds.
+   *     * duration (_number_); The length in time in milliseconds.
    *
-   * @param The length in time in seconds.
+   * @param The length in time in milliseconds.
    */
   @SimpleFunction
-  public void Buzz(int duration) {
+  public void Buzz(int duration, int frequency) {
     if (duration <= 0) {
       form.dispatchErrorOccurredEvent(this,
                                       "Buzz",
                                       ErrorMessages.ERROR_EXTENSION_ERROR,
                                       ERROR_INVALID_DURATION,
                                       LOG_TAG,
-                                      "The duration should be positive integers");
+                                      "The duration should be positive integers.");
+      return;
+    }
+
+    if (frequency < MIN_FREQ || frequency > MAX_FREQ) {
+      form.dispatchErrorOccurredEvent(this,
+                                      "Buzz",
+                                      ErrorMessages.ERROR_EXTENSION_ERROR,
+                                      ERROR_INVALID_DURATION,
+                                      LOG_TAG,
+                                      "The frequency cannot be less than 20 or be greater than 20000.");
       return;
     }
 
     if (!IsSupported())
       return;
 
-    int data = (mFreq << 16) | duration;
-    bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, data);
+    // due to frequency check above, data value is always positive
+    int data = (frequency << 16) | (duration & 0x0000FFFF);
+
+    bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, -data);
   }
 
   /**

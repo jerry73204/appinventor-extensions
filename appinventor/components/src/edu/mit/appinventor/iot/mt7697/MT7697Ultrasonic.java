@@ -41,7 +41,7 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
   // constants
   private static final int TIMER_INTERVAL = 500; // ms
   private static final String LOG_TAG = "MT7697Ultrasonic";
-  private static final String DEFAULT_PIN = "8";
+  private static final String DEFAULT_PIN = "4";
   private static final String DEFAULT_UNIT = "cm";
   private static final String[] VALID_PINS = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"};
 
@@ -53,13 +53,13 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
   private String mDataCharUuid;
   private final String mServiceUuid = PIN_SERVICE_UUID; // unchanged in current implementation
 
-  final BluetoothLE.BLEResponseHandler<Long> inputUpdateCallback = new BluetoothLE.BLEResponseHandler<Long>() {
+  final BluetoothLE.BLEResponseHandler<Long> distanceUpdateCallback = new BluetoothLE.BLEResponseHandler<Long>() {
     @Override
     public void onReceive(String serviceUUID, String characteristicUUID, List<Long> values) {
       int receivedValue = values.get(0).intValue();
 
       if (receivedValue >= 0)
-        InputUpdated((double) receivedValue);
+        DistanceUpdated((double) receivedValue);
     }
   };
 
@@ -68,11 +68,10 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
   Runnable periodicTask = new Runnable() {
     @Override
     public void run() {
-      if (!IsSupported())
-        return;
-
-      // write mode
-      bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
+      if (IsSupported()) {
+        // write mode
+        bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
+      }
 
       handler.postDelayed(this, TIMER_INTERVAL);
     }
@@ -126,7 +125,7 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
 
     // try to unregister callbacks
     if (IsSupported())
-      bleConnection.ExUnregisterForValues(mServiceUuid, mDataCharUuid, inputUpdateCallback);
+      bleConnection.ExUnregisterForValues(mServiceUuid, mDataCharUuid, distanceUpdateCallback);
 
     // assign values
     mPin = pin;
@@ -174,22 +173,22 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
   }
 
   /**
-   * Enable the InputUpdated event.
+   * Enable the DistanceUpdated event.
    */
   @SimpleFunction
-  public void RequestInputUpdates() {
+  public void RequestDistanceUpdate() {
     if (IsSupported()) {
-      bleConnection.ExRegisterForIntegerValues(mServiceUuid, mDataCharUuid, true, inputUpdateCallback);
+      bleConnection.ExRegisterForIntegerValues(mServiceUuid, mDataCharUuid, true, distanceUpdateCallback);
     }
   }
 
   /**
-   * Disable the previously requested InputUpdated event.
+   * Disable the previously requested DistanceUpdated event.
    */
   @SimpleFunction
-  public void StopInputUpdates() {
+  public void StopDistanceUpdate() {
     if (IsSupported()) {
-      bleConnection.ExUnregisterForValues(mServiceUuid, mDataCharUuid, inputUpdateCallback);
+      bleConnection.ExUnregisterForValues(mServiceUuid, mDataCharUuid, distanceUpdateCallback);
     }
   }
 
@@ -209,7 +208,7 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
   }
 
   /**
-   * The InputUpdated event is triggered when a value is received from the input pin of MT7697.
+   * The DistanceUpdated event is triggered when a value is received from the input pin of MT7697.
    *
    * __Parameters__:
    *
@@ -218,10 +217,10 @@ public class MT7697Ultrasonic extends MT7697ExtensionBase {
    * @param The distance percieced by the sensor.
    */
   @SimpleEvent
-  public void InputUpdated(double value) {
+  public void DistanceUpdated(double value) {
     if (mUnit.equals("inch"))
       value *= 0.393701;
 
-    EventDispatcher.dispatchEvent(this, "InputUpdated", value);
+    EventDispatcher.dispatchEvent(this, "DistanceUpdated", value);
   }
 }
