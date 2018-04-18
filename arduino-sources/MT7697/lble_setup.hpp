@@ -62,7 +62,7 @@ static LBLECharacteristicInt PIN17_DATA_CHAR(PIN17_DATA_CHAR_UUID, LBLE_READ | L
 struct pin_lble_profile
 {
     int pin;
-    int mode; 
+    int mode;
     LBLECharacteristicInt *mode_char;
     LBLECharacteristicInt *data_char;
 };
@@ -97,15 +97,14 @@ public:
           &PIN07_MODE_CHAR,
           &PIN07_DATA_CHAR },
         // reserve for i2c
-        //
-        // { 8,
-        //   MODE_UNSET,
-        //   &PIN08_MODE_CHAR,
-        //   &PIN08_DATA_CHAR },
-        // { 9,
-        //   MODE_UNSET,
-        //   &PIN09_MODE_CHAR,
-        //   &PIN09_DATA_CHAR },
+        { 8,
+          MODE_UNSET,
+          &PIN08_MODE_CHAR,
+          &PIN08_DATA_CHAR },
+        { 9,
+          MODE_UNSET,
+          &PIN09_MODE_CHAR,
+          &PIN09_DATA_CHAR },
         { 10,
           MODE_UNSET,
           &PIN10_MODE_CHAR,
@@ -178,11 +177,11 @@ public:
 
         // reserve for i2c
         //
-        // PIN_SERVICE.addAttribute(PIN08_MODE_CHAR);
-        // PIN_SERVICE.addAttribute(PIN08_DATA_CHAR);
-        //
-        // PIN_SERVICE.addAttribute(PIN09_MODE_CHAR);
-        // PIN_SERVICE.addAttribute(PIN09_DATA_CHAR);
+        PIN_SERVICE.addAttribute(PIN08_MODE_CHAR);
+        PIN_SERVICE.addAttribute(PIN08_DATA_CHAR);
+
+        PIN_SERVICE.addAttribute(PIN09_MODE_CHAR);
+        PIN_SERVICE.addAttribute(PIN09_DATA_CHAR);
 
         PIN_SERVICE.addAttribute(PIN10_MODE_CHAR);
         PIN_SERVICE.addAttribute(PIN10_DATA_CHAR);
