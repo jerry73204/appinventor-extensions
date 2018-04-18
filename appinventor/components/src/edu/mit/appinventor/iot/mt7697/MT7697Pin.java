@@ -276,6 +276,17 @@ public class MT7697Pin extends MT7697ExtensionBase {
   }
 
   /**
+   * Obtain the most recent reading from the pin. On success, the <a href="#ProximityReceived"><code>InputUpdated</code></a> event will be triggered.
+   */
+  @SimpleFunction
+  public void Read() {
+    if ( IsSupported() && (mMode == MODE_ANALOG_INPUT || mMode == MODE_DIGITAL_INPUT) ) {
+      bleConnection.ExReadIntegerValues(mServiceUuid, mDataCharUuid, true, inputUpdateCallback);
+    }
+  }
+
+
+  /**
    * Enable the InputUpdated event.
    */
   @SimpleFunction
