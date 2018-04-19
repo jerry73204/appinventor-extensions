@@ -139,11 +139,13 @@ public class MT7697Buzzer extends MT7697ExtensionBase {
    * __Parameters__:
    *
    *     * duration (_number_); The length in time in milliseconds.
+   *     * frequency (_number_); frequency in Hz among 20~20000.
    *
-   * @param The length in time in milliseconds.
+   * @param duration The length in time in milliseconds.
+   * @param frequency  The frequency in Hz among 20~20000.
    */
   @SimpleFunction
-  public void Buzz(int duration, int frequency) {
+  public void Buzz(int frequency, int duration) {
     if (duration <= 0) {
       form.dispatchErrorOccurredEvent(this,
                                       "Buzz",
