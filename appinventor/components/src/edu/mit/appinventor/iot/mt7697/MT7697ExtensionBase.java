@@ -33,6 +33,7 @@ public abstract class MT7697ExtensionBase extends AndroidNonvisibleComponent {
   protected static final int ERROR_INVALID_WRITE_VALUE   = 9103;
   protected static final int ERROR_INVALID_STATE         = 9104;
   protected static final int ERROR_INVALID_DURATION      = 9105;
+  protected static final int ERROR_INVALID_FREQUENCY     = 9106;
 
   protected static final String STRING_ANALOG_INPUT   = "analog input";
   protected static final String STRING_ANALOG_OUTPUT  = "analog output";

@@ -48,6 +48,12 @@ class Constants {
     PIN_UUID_LOOKUP.put("7", new UuidOfPin("ccb7be00-77bd-4349-86a6-14cc7673ca07",
                                            "ccb7be01-77bd-4349-86a6-14cc7673ca07"));
 
+    PIN_UUID_LOOKUP.put("8", new UuidOfPin("ccb7be00-77bd-4349-86a6-14cc7673ca08",
+                                           "ccb7be01-77bd-4349-86a6-14cc7673ca08"));
+
+    PIN_UUID_LOOKUP.put("9", new UuidOfPin("ccb7be00-77bd-4349-86a6-14cc7673ca09",
+                                           "ccb7be01-77bd-4349-86a6-14cc7673ca09"));
+
     PIN_UUID_LOOKUP.put("10", new UuidOfPin("ccb7be00-77bd-4349-86a6-14cc7673ca10",
                                             "ccb7be01-77bd-4349-86a6-14cc7673ca10"));
 

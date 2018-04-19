@@ -78,16 +78,15 @@ public class MT7697Pin extends MT7697ExtensionBase {
   Runnable periodicTask = new Runnable() {
     @Override
     public void run() {
-      if (!IsSupported())
-        return;
+      if (IsSupported()) {
+        if (mMode != MODE_UNSET) {
+          // write mode
+          bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
 
-      // write mode
-      if (mMode != MODE_UNSET) {
-        bleConnection.ExWriteIntegerValues(mServiceUuid, mModeCharUuid, true, mMode);
-
-        // write data
-        if ( (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT || mMode == MODE_SERVO) && (mData != INIT_OUTPUT_DATA) )
-          bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
+          // write data
+          if ( (mMode == MODE_ANALOG_OUTPUT || mMode == MODE_DIGITAL_OUTPUT || mMode == MODE_SERVO) && (mData != INIT_OUTPUT_DATA) )
+            bleConnection.ExWriteIntegerValues(mServiceUuid, mDataCharUuid, true, mData);
+        }
       }
 
       handler.postDelayed(this, TIMER_INTERVAL);
@@ -277,11 +276,22 @@ public class MT7697Pin extends MT7697ExtensionBase {
   }
 
   /**
+   * Obtain the most recent reading from the pin. On success, the <a href="#ProximityReceived"><code>InputUpdated</code></a> event will be triggered.
+   */
+  @SimpleFunction
+  public void Read() {
+    if ( IsSupported() && (mMode == MODE_ANALOG_INPUT || mMode == MODE_DIGITAL_INPUT) ) {
+      bleConnection.ExReadIntegerValues(mServiceUuid, mDataCharUuid, true, inputUpdateCallback);
+    }
+  }
+
+
+  /**
    * Enable the InputUpdated event.
    */
   @SimpleFunction
-  public void RequestInputUpdates() {
-    if (IsSupported()) {
+  public void RequestInputUpdate() {
+    if ( IsSupported() && (mMode == MODE_ANALOG_INPUT || mMode == MODE_DIGITAL_INPUT) ) {
       bleConnection.ExRegisterForIntegerValues(mServiceUuid, mDataCharUuid, true, inputUpdateCallback);
     }
   }
@@ -290,7 +300,7 @@ public class MT7697Pin extends MT7697ExtensionBase {
    * Disable the previously requested InputUpdated event.
    */
   @SimpleFunction
-  public void StopInputUpdates() {
+  public void StopInputUpdate() {
     if (IsSupported()) {
       bleConnection.ExUnregisterForValues(mServiceUuid, mDataCharUuid, inputUpdateCallback);
     }
